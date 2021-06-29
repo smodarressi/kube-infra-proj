@@ -1,0 +1,33 @@
+First we need a metric server to deal with scaling up and down the pods 
+
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl get pods -n kube-system
+wget -c https://gist.githubusercontent.com/initcron/1a2bd25353e1faa22a0ad41ad1c01b62/raw/008e23f9fbf4d7e2cf79df1dd008de2f1db62a10/k8s-metrics-server.patch.yaml
+kubectl patch deploy metrics-server -p "$(cat k8s-metrics-server.patch.yaml)" -n kube-system
+
+Show that metrics server is working 
+
+kubectl get pods -n kube-system
+kubectl top nodes --use-protocol-buffers
+kubectl top pods --use-protocol-buffers
+
+8.	Set criteria such that if the memory of CPU goes beyond 50%, environments automatically get scaled up and configured
+
+First it needs a base allocation of cpu for the pod
+This was added beforehand for this step in the wordpress deployment yaml 
+resources:
+    limits:
+    cpu: 500m
+    requests:
+    cpu: 200m
+
+Now we need a horizontalpod autoscaler for scale up at the threshold value of 50.
+kubectl autoscale deployment wordpress --cpu-percent=50 --min=1 --max=10
+#this is seen in hpa-scaling.yml
+
+Apply load 
+kubectl run -i --tty load-generator --image=busybox /bin/sh
+Enter following line after /bin/sh runs 
+while true; do wget -q -O- http://php-apache.default.svc.cluster.local; done
+
+Check hpa

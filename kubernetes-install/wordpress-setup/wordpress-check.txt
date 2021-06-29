@@ -1,0 +1,8 @@
+#Setup and check mysql deployment
+kubectl create -f mysql-deploy.yml 
+kubectl expose deployment test-mysql --port=3306
+kubectl get svc
+
+#Setup and check wordpress deployment
+kubectl create -f wordpress.yml 
+kubectl expose deployment wordpress --port=80 --type=NodePort

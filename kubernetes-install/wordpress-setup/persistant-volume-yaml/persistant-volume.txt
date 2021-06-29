@@ -1,0 +1,1 @@
+Need storage setup before creating mysql and wordpress (application)

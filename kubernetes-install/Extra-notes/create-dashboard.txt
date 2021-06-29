@@ -1,0 +1,31 @@
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
+kubectl get svc -n kubernetes-dashboard
+kubectl get pods  -n kubernetes-dashboard
+kubectl edit svc kubernetes-dashboard -n kubernetes-dashboard
+
+Change to NodePort
+
+kubectl get svc -n kubernetes-dashboard
+
+Authentication to login to dashboard
+kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep kubernetes-dashboard | awk '{print $1}')
+
+Recreate clusterrolebinding to allow seeing the cluster
+kubectl delete  clusterrolebinding kubernetes-dashboard -n kubernetes-dashboard
+kubectl create clusterrolebinding mybinding --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:kubernetes-dashboard
+
+To see permissions of the cluster-role type this
+kubectl get clusterrole cluster-admin -o yaml  
+
+kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep kubernetes-dashboard | awk '{print $1}')
+
+user name: cluster-user1
+
+ kubectl create serviceaccount cluster-user1 -n kubernetes-dashboard
+
+Creates clusterrolebinding role view with user cluster-user1
+kubectl create clusterrolebinding user1binding --clusterrole=view --serviceaccount=kubernetes-dashboard:cluster-user1
+
+kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep cluster-user1 | awk '{print $1}')
+
+

@@ -1,0 +1,51 @@
+Cluster Role - admin, view, cluster-admin
+CRB = CR + SA
+
+RBAC - Kubectl clients 
+Show kubectl client usage with a new user
+We will use a different node to demonstrate it 
+
+Need namespace - we will use the default namespace
+
+In both the master and one of the nodes 
+mkdir kubelet-client-user
+
+On master:
+cd kubelet-client-user/
+
+Make the credential keys 
+Only important to use these values when creating the keys.
+Organisation name → namespace 
+common name  → user3
+
+sudo openssl genrsa -out new-user.key 2048
+sudo openssl req -new -key new-user.key -out new-user.csr
+sudo openssl x509 -req -in new-user.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out new-user.crt -days 500
+
+
+Refer to role-binding and role yaml 
+These will create the user in the role.yml with the commands specificed and role-binding.yml   
+
+kubectl create -f role.yaml
+kubectl create -f rolebinding.yaml
+
+Set credentials (this will add into .kube/config file)
+
+kubectl config set-credentials new-user --client-certificate=/home/ubuntu/kubelet-client-user/new-user.crt --client-key=/home/ubuntu/kubelet-client-user/new-user.key
+   
+   
+Set context to default Namespace:
+
+kubectl config set-context  new-user-context --cluster=kubernetes --namespace=default --user=new-user
+
+kubectl config get-contexts
+
+Copy .kube/config to node of interest directory .kube/config. 
+vi and change current-context: new-user-context
+
+Show limitations of kubectl by typing in commands for other than nodes. 
+
+This can be used in other nodes to specify context user account
+Copy folder of certificate keys (.crt and .key) to directory ~/kubelet-client-user
+
+

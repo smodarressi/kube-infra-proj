@@ -1,0 +1,20 @@
+First we need credentials for the new user
+We will create them in the ~/new-user-role-credentials directory
+cd into the directory
+Do following commands:
+sudo openssl genrsa -out new-user.key 2048
+sudo openssl req -new -key new-user.key -out new-user.csr
+sudo openssl x509 -req -in new-user.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out new-user.crt -days 500
+
+When creating credentials - 
+Organisation name → namespace of interest (we will use default)
+and common name  → new-user (user name using in role-binding yaml)
+
+Apply yaml files for requirements
+kubectl config set-credentials new-user --client-certificate=/home/ubuntu/new-user-role-credentials/new-user.crt --client-key=/home/ubuntu/new-user-role-credentials/new-user.key
+
+Set context to 
+kubectl config set-context  new-user-context --cluster=kubernetes --namespace=default --user=new-user
+
+cat .kube/config
+This file needs to be the same in the worker nodes config

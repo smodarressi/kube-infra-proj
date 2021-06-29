@@ -1,0 +1,16 @@
+---
+- name: Transfer and execute Kubernetes scripts
+  hosts: master, workers
+  remote_user: ubuntu
+  become: yes
+  # become_user: root
+  tasks:
+     - name: Transfer the docker script
+       copy: src=docker.sh dest=/home/ubuntu mode=0655
+     - name: Transfer the kubernetes script
+       copy: src=kube.sh dest=/home/ubuntu mode=0655
+     - name: Execute the docker script
+       command: sh docker.sh
+     - name: Execute the kubernetes script
+       command: sh kube.sh
+

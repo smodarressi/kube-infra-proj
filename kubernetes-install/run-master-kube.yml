@@ -1,0 +1,9 @@
+---
+- hosts: master
+  remote_user: ubuntu
+  become: yes
+  tasks: 
+     - name: Transfer master setup script
+       copy: src=master-kube.sh dest=/home/ubuntu mode=0655
+     - name: Execute master setup
+       command: sh master-kube.sh
